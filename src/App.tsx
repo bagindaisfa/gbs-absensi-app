@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 
 function App() {
   const [logged, setLogged] = useState(false);
+  const [loadingLogin, setLoadingLogin] = useState(false);
   const [idKaryawan, setIdKaryawan] = useState(0);
   const [idShift, setIdShift] = useState(0);
   const [idLokasi, setIdLokasi] = useState(0);
@@ -24,7 +25,7 @@ function App() {
   };
 
   const onFinish = async (values: any) => {
-    console.log("Received values of form: ", values);
+    setLoadingLogin(true);
     try {
       const response = await fetch(
         `https://internal.gbssecurindo.co.id/login?username=${values.username}&password=${values.password}`
@@ -44,9 +45,12 @@ function App() {
       } else {
         setLogged(false);
         error();
+        setLoadingLogin(false);
       }
-    } catch (error) {
-      console.log("Error fetching data:", error);
+    } catch (err) {
+      console.log("Error fetching data:", err);
+      error();
+      setLoadingLogin(false);
     }
   };
 
@@ -79,8 +83,10 @@ function App() {
         const id_shift = await getIdShiftForToday(data_shift);
         setIdShift(id_shift);
       }
+      setLoadingLogin(false);
     } catch (error) {
       console.log("Error fetching data:", error);
+      setLoadingLogin(false);
     }
   };
 
@@ -163,6 +169,7 @@ function App() {
                   type="primary"
                   htmlType="submit"
                   className="login-form-button"
+                  loading={loadingLogin}
                 >
                   Log in
                 </Button>

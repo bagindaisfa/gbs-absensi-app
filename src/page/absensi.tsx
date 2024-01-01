@@ -109,8 +109,7 @@ const Absensi = (value: any) => {
   const day = String(currentDate.getDate()).padStart(2, "0");
   const formattedDate = `${year}-${month}-${day}`;
   const dateFormat = "YYYY-MM-DD";
-  const [startDate, setStartDate] = useState(formattedDate);
-  const [endDate, setEndDate] = useState(formattedDate);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [photoData, setPhotoData] = useState<string>("");
   const [takeButton, setTakeButton] = useState(false);
   const [uploadButton, setUploadButton] = useState(false);
@@ -275,6 +274,7 @@ const Absensi = (value: any) => {
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const submit = async () => {
+    setLoadingSubmit(true);
     let hari_izin: any = [];
     if (status === "Izin" || status === "Sakit") {
       await form
@@ -326,17 +326,20 @@ const Absensi = (value: any) => {
         const errorResponse = await response.json();
         const errorMessage = errorResponse?.error || "Unknown error occurred.";
         error(errorMessage);
+        setLoadingSubmit(false);
       } else {
         // Handle response if needed
         const data = await response.json();
         console.log("Response:", data);
         setGetPhoto(false);
         window.location.reload();
+        setLoadingSubmit(false);
       }
     } catch (err) {
       console.error("Error:", err);
       setGetPhoto(false);
       error(err);
+      setLoadingSubmit(false);
     }
   };
 
@@ -563,6 +566,7 @@ const Absensi = (value: any) => {
                 value.status_absen.length >= 2 ||
                 (getPhoto && !photoData)
               }
+              loading={loadingSubmit}
             >
               {getPhoto ? <span>Simpan</span> : <span>Ambil Foto</span>}
             </Button>
