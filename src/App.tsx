@@ -86,6 +86,10 @@ function App() {
 
   const getIdShiftForToday = (data: any) => {
     const currentDate = new Date(); // Get the current date
+    currentDate.setHours(7);
+    currentDate.setMinutes(0);
+    currentDate.setSeconds(0);
+    currentDate.setMilliseconds(0);
 
     for (const entry of data) {
       const startDate = new Date(entry.start_date);
