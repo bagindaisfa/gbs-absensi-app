@@ -451,35 +451,35 @@ const Absensi = (value: any) => {
                 >
                   <Radio.Button
                     value="Hadir"
-                    disabled={
-                      value.status_absen.some((item: any) =>
-                        /^Izin/.test(item)
-                      ) || value.status_absen.includes("Hadir")
-                    }
+                    // disabled={
+                    //   value.status_absen.some((item: any) =>
+                    //     /^Izin/.test(item)
+                    //   ) || value.status_absen.includes("Hadir")
+                    // }
                   >
                     Hadir
                   </Radio.Button>
                   <Radio.Button
                     value="Pulang"
-                    disabled={
-                      value.status_absen.some((item: any) =>
-                        /^Izin/.test(item)
-                      ) ||
-                      value.status_absen.includes("Pulang") ||
-                      value.status_absen.length <= 0
-                    }
+                    // disabled={
+                    //   value.status_absen.some((item: any) =>
+                    //     /^Izin/.test(item)
+                    //   ) ||
+                    //   value.status_absen.includes("Pulang") ||
+                    //   value.status_absen.length <= 0
+                    // }
                   >
                     Pulang
                   </Radio.Button>
                   <Radio.Button
                     value="Izin"
-                    disabled={value.status_absen.length > 0}
+                    // disabled={value.status_absen.length > 0}
                   >
                     Izin
                   </Radio.Button>
                   <Radio.Button
                     value="Sakit"
-                    disabled={value.status_absen.length > 0}
+                    // disabled={value.status_absen.length > 0}
                   >
                     Sakit
                   </Radio.Button>
