@@ -14,6 +14,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import axios from "axios";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -212,12 +213,12 @@ const Absensi = (value: any) => {
 
   const getLokasi = async () => {
     try {
-      const response = await fetch(lokasiURL); // Replace with your API endpoint
-      if (!response.ok) {
+      const response = await axios.get(lokasiURL); // Replace with your API endpoint
+      if (!response) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.json();
+      const result = await response.data;
       if (result) {
         setLokasiList(result.lokasi);
       }
@@ -317,19 +318,16 @@ const Absensi = (value: any) => {
 
     try {
       const url = "http://195.35.36.220:3001/absensi";
-      const response = await fetch(url, {
-        method: "POST",
+      const response = await axios.post(url, {
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorResponse = await response.json();
-        const errorMessage = errorResponse?.error || "Unknown error occurred.";
-        error(errorMessage);
+      if (!response) {
+        error("Gagal Absen");
         setLoadingSubmit(false);
       } else {
         // Handle response if needed
-        const data = await response.json();
+        const data = await response.data;
         console.log("Response:", data);
         setGetPhoto(false);
         window.location.reload();

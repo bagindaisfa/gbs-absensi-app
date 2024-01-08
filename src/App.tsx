@@ -4,6 +4,7 @@ import "./App.css";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, message, Form, Input, Card } from "antd";
 import dayjs from "dayjs";
+import axios from "axios";
 
 function App() {
   const [logged, setLogged] = useState(false);
@@ -27,14 +28,14 @@ function App() {
   const onFinish = async (values: any) => {
     setLoadingLogin(true);
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://195.35.36.220:3001/login?username=${values.username}&password=${values.password}`
       ); // Replace with your API endpoint
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.json();
+      const result = await response.data;
       console.log("result :", result);
       if (result.valid) {
         setLogged(true);
@@ -56,18 +57,18 @@ function App() {
 
   const getKaryawan = async (id_karyawan: number, id_lokasi: number) => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         shiftKaryawanURL +
           "?id_karyawan=" +
           id_karyawan +
           "&id_lokasi=" +
           id_lokasi
       ); // Replace with your API endpoint
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.json();
+      const result = await response.data;
       if (result) {
         const data_shift = result.shiftkaryawan.map((item: any) => {
           return {
