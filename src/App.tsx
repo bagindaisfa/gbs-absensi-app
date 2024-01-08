@@ -13,7 +13,7 @@ function App() {
   const [idLokasi, setIdLokasi] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
   const [statusAbsen, setStatusAbsen] = useState([]);
-  const shiftKaryawanURL = "https://internal.gbssecurindo.co.id/shiftkaryawan";
+  const shiftKaryawanURL = "http://195.35.36.220:3001/shiftkaryawan";
   const [shiftKaryawanList, setShiftKaryawanList] = useState([]);
   const dateFormat = "YYYY-MM-DD";
 
@@ -28,7 +28,7 @@ function App() {
     setLoadingLogin(true);
     try {
       const response = await fetch(
-        `https://internal.gbssecurindo.co.id/login?username=${values.username}&password=${values.password}`
+        `http://195.35.36.220:3001/login?username=${values.username}&password=${values.password}`
       ); // Replace with your API endpoint
       if (!response.ok) {
         throw new Error("Network response was not ok.");
