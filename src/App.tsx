@@ -4,7 +4,6 @@ import "./App.css";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, message, Form, Input, Card } from "antd";
 import dayjs from "dayjs";
-import axios from "axios";
 
 function App() {
   const [logged, setLogged] = useState(false);
@@ -14,7 +13,7 @@ function App() {
   const [idLokasi, setIdLokasi] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
   const [statusAbsen, setStatusAbsen] = useState([]);
-  const shiftKaryawanURL = "http://195.35.36.220:3001/shiftkaryawan";
+  const shiftKaryawanURL = "https://internal.gbssecurindo.co.id/shiftkaryawan";
   const [shiftKaryawanList, setShiftKaryawanList] = useState([]);
   const dateFormat = "YYYY-MM-DD";
 
@@ -28,14 +27,14 @@ function App() {
   const onFinish = async (values: any) => {
     setLoadingLogin(true);
     try {
-      const response = await axios.get(
-        `http://195.35.36.220:3001/login?username=${values.username}&password=${values.password}`
+      const response = await fetch(
+        `https://internal.gbssecurindo.co.id/login?username=${values.username}&password=${values.password}`
       ); // Replace with your API endpoint
-      if (!response) {
+      if (!response.ok) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.data;
+      const result = await response.json();
       console.log("result :", result);
       if (result.valid) {
         setLogged(true);
@@ -57,18 +56,18 @@ function App() {
 
   const getKaryawan = async (id_karyawan: number, id_lokasi: number) => {
     try {
-      const response = await axios.get(
+      const response = await fetch(
         shiftKaryawanURL +
           "?id_karyawan=" +
           id_karyawan +
           "&id_lokasi=" +
           id_lokasi
       ); // Replace with your API endpoint
-      if (!response) {
+      if (!response.ok) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.data;
+      const result = await response.json();
       if (result) {
         const data_shift = result.shiftkaryawan.map((item: any) => {
           return {

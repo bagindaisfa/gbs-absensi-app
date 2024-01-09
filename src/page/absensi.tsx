@@ -14,7 +14,6 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import axios from "axios";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -122,7 +121,7 @@ const Absensi = (value: any) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [idLokasi, setIdLokasi] = useState<any>(0);
   const [lokasiList, setLokasiList] = useState([]);
-  const lokasiURL = "http://195.35.36.220:3001/masterLokasi";
+  const lokasiURL = "https://internal.gbssecurindo.co.id/masterLokasi";
 
   React.useEffect(() => {
     getLocation();
@@ -213,12 +212,12 @@ const Absensi = (value: any) => {
 
   const getLokasi = async () => {
     try {
-      const response = await axios.get(lokasiURL); // Replace with your API endpoint
-      if (!response) {
+      const response = await fetch(lokasiURL); // Replace with your API endpoint
+      if (!response.ok) {
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.data;
+      const result = await response.json();
       if (result) {
         setLokasiList(result.lokasi);
       }
@@ -317,17 +316,20 @@ const Absensi = (value: any) => {
     }
 
     try {
-      const url = "http://195.35.36.220:3001/absensi";
-      const response = await axios.post(url, {
+      const url = "https://internal.gbssecurindo.co.id/absensi";
+      const response = await fetch(url, {
+        method: "POST",
         body: formData,
       });
 
-      if (!response) {
-        error("Gagal Absen");
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        const errorMessage = errorResponse?.error || "Unknown error occurred.";
+        error(errorMessage);
         setLoadingSubmit(false);
       } else {
         // Handle response if needed
-        const data = await response.data;
+        const data = await response.json();
         console.log("Response:", data);
         setGetPhoto(false);
         window.location.reload();
