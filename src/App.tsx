@@ -14,7 +14,7 @@ function App() {
   const [messageApi, contextHolder] = message.useMessage();
   const [statusAbsen, setStatusAbsen] = useState([]);
   const shiftKaryawanURL = "https://internal.gbssecurindo.co.id/shiftkaryawan";
-  const [shiftKaryawanList, setShiftKaryawanList] = useState([]);
+
   const dateFormat = "YYYY-MM-DD";
 
   const error = () => {
@@ -77,9 +77,10 @@ function App() {
             id_karyawan: item.id_karyawan,
             start_date: dayjs(item.start_date).format(dateFormat),
             end_date: dayjs(item.end_date).format(dateFormat),
+            jam_masuk: item.jam_masuk,
+            jam_keluar: item.jam_keluar,
           };
         });
-        setShiftKaryawanList(data_shift);
         const id_shift = await getIdShiftForToday(data_shift);
         setIdShift(id_shift);
       }
@@ -91,11 +92,7 @@ function App() {
   };
 
   const getIdShiftForToday = (data: any) => {
-    const currentDate = new Date(); // Get the current date
-    currentDate.setHours(7);
-    currentDate.setMinutes(0);
-    currentDate.setSeconds(0);
-    currentDate.setMilliseconds(0);
+    const currentDate = new Date(); // Get the current date and time
 
     for (const entry of data) {
       const startDate = new Date(entry.start_date);
@@ -103,12 +100,35 @@ function App() {
 
       // Check if the current date falls within the date range
       if (currentDate >= startDate && currentDate <= endDate) {
-        return entry.id_shift; // Return the id_shift if the date matches
+        // Extract hours, minutes, and seconds from jam_masuk and jam_keluar
+        const [jamMasukHours, jamMasukMinutes, jamMasukSeconds] =
+          entry.jam_masuk.split(":").map(Number);
+        const [jamKeluarHours, jamKeluarMinutes, jamKeluarSeconds] =
+          entry.jam_keluar.split(":").map(Number);
+
+        // Check if the current time is between jam_masuk and jam_keluar
+        const currentHours = currentDate.getHours();
+        const currentMinutes = currentDate.getMinutes();
+        const currentSeconds = currentDate.getSeconds();
+
+        if (
+          (currentHours > jamMasukHours ||
+            (currentHours === jamMasukHours &&
+              currentMinutes >= jamMasukMinutes &&
+              currentSeconds >= jamMasukSeconds)) &&
+          (currentHours < jamKeluarHours ||
+            (currentHours === jamKeluarHours &&
+              currentMinutes <= jamKeluarMinutes &&
+              currentSeconds <= jamKeluarSeconds))
+        ) {
+          return entry.id_shift; // Return the id_shift if the date and time match
+        }
       }
     }
 
-    return null; // Return null if no matching date range is found for today
+    return null; // Return null if no matching date and time range is found for today
   };
+
   return (
     <>
       {contextHolder}
