@@ -103,17 +103,13 @@ const Absensi = (value: any) => {
   const [form] = Form.useForm();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Adding 1 as months are zero-based
-  const day = String(currentDate.getDate()).padStart(2, "0");
-  const formattedDate = `${year}-${month}-${day}`;
   const dateFormat = "YYYY-MM-DD";
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [photoData, setPhotoData] = useState<string>("");
   const [takeButton, setTakeButton] = useState(false);
   const [uploadButton, setUploadButton] = useState(false);
   const [getPhoto, setGetPhoto] = useState(false);
+  const [backup, setBackup] = useState(false);
   const [status, setStatus] = useState("");
   const [keterangan, setKeterangan] = useState("");
   const [lat, setLat] = useState("");
@@ -143,6 +139,12 @@ const Absensi = (value: any) => {
       setUploadButton(true);
     } else {
       setUploadButton(false);
+    }
+    if (value === "Backup Hadir" || value === "Backup Pulang") {
+      setBackup(true);
+    } else {
+      setBackup(false);
+      setIdLokasi(0);
     }
   };
 
@@ -300,12 +302,10 @@ const Absensi = (value: any) => {
 
     const formData = new FormData();
     formData.append("id_karyawan", value.id_karyawan);
-
     formData.append("latitude", lat);
     formData.append("longitude", long);
     formData.append("foto", blob);
-    formData.append("id_shift", value.id_shift ?? 0);
-    formData.append("id_lokasi", value.id_shift ? value.id_lokasi : idLokasi);
+    formData.append("id_lokasi", backup ? idLokasi : value.id_lokasi);
     formData.append("hari_izin", JSON.stringify(hari_izin));
     if (status === "Izin" || status === "Sakit") {
       formData.append("status", status);
@@ -415,7 +415,36 @@ const Absensi = (value: any) => {
             </tr>
           </>
         )}
-        {!value.id_shift && (
+
+        {!getPhoto && (
+          <>
+            <tr>
+              <td style={{ textAlign: "center" }}>
+                <Radio.Group
+                  buttonStyle="solid"
+                  onChange={onChangeStatus}
+                  style={{ margin: 15 }}
+                >
+                  <Radio.Button value="Hadir">Hadir</Radio.Button>
+                  <Radio.Button value="Pulang">Pulang</Radio.Button>
+                  <Radio.Button value="Izin">Izin</Radio.Button>
+                  <Radio.Button value="Sakit">Sakit</Radio.Button>
+                  <tr>
+                    <td>
+                      <Radio.Button value="Backup Hadir">
+                        Backup Hadir
+                      </Radio.Button>
+                      <Radio.Button value="Backup Pulang">
+                        Backup Pulang
+                      </Radio.Button>
+                    </td>
+                  </tr>
+                </Radio.Group>
+              </td>
+            </tr>
+          </>
+        )}
+        {backup && (
           <>
             <tr>
               <td style={{ textAlign: "center" }}>
@@ -427,7 +456,11 @@ const Absensi = (value: any) => {
                   allowClear
                   filterOption={filterOption}
                   style={{ minWidth: 300 }}
+                  value={idLokasi}
                 >
+                  <Option value={0} label={""}>
+                    {"Pilih lokasi"}
+                  </Option>
                   {lokasiList?.map((item: any) => {
                     return (
                       <Option value={item.id} label={item.nama_lokasi}>
@@ -436,54 +469,6 @@ const Absensi = (value: any) => {
                     );
                   })}
                 </Select>
-              </td>
-            </tr>
-          </>
-        )}
-        {!getPhoto && (
-          <>
-            <tr>
-              <td style={{ textAlign: "center" }}>
-                <Radio.Group
-                  buttonStyle="solid"
-                  onChange={onChangeStatus}
-                  style={{ margin: 15 }}
-                >
-                  <Radio.Button
-                    value="Hadir"
-                    // disabled={
-                    //   value.status_absen.some((item: any) =>
-                    //     /^Izin/.test(item)
-                    //   ) || value.status_absen.includes("Hadir")
-                    // }
-                  >
-                    Hadir
-                  </Radio.Button>
-                  <Radio.Button
-                    value="Pulang"
-                    // disabled={
-                    //   value.status_absen.some((item: any) =>
-                    //     /^Izin/.test(item)
-                    //   ) ||
-                    //   value.status_absen.includes("Pulang") ||
-                    //   value.status_absen.length <= 0
-                    // }
-                  >
-                    Pulang
-                  </Radio.Button>
-                  <Radio.Button
-                    value="Izin"
-                    // disabled={value.status_absen.length > 0}
-                  >
-                    Izin
-                  </Radio.Button>
-                  <Radio.Button
-                    value="Sakit"
-                    // disabled={value.status_absen.length > 0}
-                  >
-                    Sakit
-                  </Radio.Button>
-                </Radio.Group>
               </td>
             </tr>
           </>
@@ -564,7 +549,8 @@ const Absensi = (value: any) => {
               disabled={
                 value.status_absen.some((item: any) => /^Izin/.test(item)) ||
                 value.status_absen.length >= 2 ||
-                (getPhoto && !photoData)
+                (getPhoto && !photoData) ||
+                (backup && idLokasi == 0)
               }
               loading={loadingSubmit}
             >
