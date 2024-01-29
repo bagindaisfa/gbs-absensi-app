@@ -17,10 +17,10 @@ function App() {
 
   const dateFormat = "YYYY-MM-DD";
 
-  const error = () => {
+  const error = (message: any) => {
     messageApi.open({
       type: "error",
-      content: "Username atau Password salah!",
+      content: message,
     });
   };
 
@@ -42,12 +42,12 @@ function App() {
         setIdLokasi(result.id_lokasi);
       } else {
         setLogged(false);
-        error();
+        error("Username atau Password salah!");
       }
       setLoadingLogin(false);
     } catch (err) {
       console.log("Error fetching data:", err);
-      error();
+      error(err);
       setLoadingLogin(false);
     }
   };
