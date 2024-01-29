@@ -325,7 +325,7 @@ const Absensi = (value: any) => {
       if (!response.ok) {
         const errorResponse = await response.json();
         const errorMessage = errorResponse?.error || "Unknown error occurred.";
-        error(errorMessage);
+        error(errorMessage ? errorMessage : "Unknown error occurred.");
         setLoadingSubmit(false);
       } else {
         // Handle response if needed
